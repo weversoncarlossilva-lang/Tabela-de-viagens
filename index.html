@@ -32,16 +32,29 @@
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
     }
-    .brand-header {
-      text-align: center;
-      margin-bottom: 10px;
+    /* Marca d'água com a logo bem clarinha ao fundo */
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      background-image: url('logo.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.07;
+      pointer-events: none;
+      z-index: 0;
     }
-    .brand-logo {
-      width: 100%;
-      max-width: 240px;
-      height: auto;
-      border-radius: 12px;
+    .container > * {
+      position: relative;
+      z-index: 1;
     }
     label {
       font-weight: bold;
@@ -166,10 +179,6 @@
 <body>
 
 <div class="container">
-  <div class="brand-header">
-    <img src="logo.png" alt="Central Transporte" class="brand-logo">
-  </div>
-
   <div class="alerts-box">
     <b>🚨 Avisos Importantes:</b>
     • <b>Noite (23h às 05h):</b> Acréscimo de R$ 5,00 a R$ 10,00.<br>
@@ -207,14 +216,4 @@
 
   <div class="price-box">
     <span>Valor da Viagem:</span>
-    <div id="valor" class="price-value">R$ --,--</div>
-  </div>
-
-  <a id="btnZap" href="#" class="btn-whatsapp" target="_blank" style="display:none;">Chamar no WhatsApp 🚗</a>
-
-  <div class="footer-text">
-    "Se Deus é por nós, quem será contra nós?"<br>Romanos 8:31 🙏
-  </div>
-</div>
-
-<script>
+    <div id="valor" class="price-value">
