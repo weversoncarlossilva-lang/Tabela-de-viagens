@@ -7,6 +7,8 @@
   <style>
     :root {
       --primary: #25D366;
+      --mic-bg: #ea4335;
+      --audio-btn: #128C7E;
       --bg: #f4f6f8;
       --card: #ffffff;
       --text: #333333;
@@ -45,6 +47,10 @@
       margin-bottom: 5px;
       font-size: 14px;
     }
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
     input.campo-texto {
       width: 100%;
       padding: 14px;
@@ -58,6 +64,26 @@
     input.campo-texto:focus {
       border-color: #25D366;
       box-shadow: 0 0 5px rgba(37, 211, 102, 0.3);
+    }
+    .btn-mic {
+      background-color: var(--mic-bg);
+      color: white;
+      border: none;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .voice-instruction {
+      background-color: #e8f0fe;
+      border: 1px solid #d2e3fc;
+      color: #1967d2;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
     }
     .checkbox-group {
       margin-top: 15px;
@@ -74,20 +100,6 @@
       margin-top: 8px;
       cursor: pointer;
       font-size: 13px;
-    }
-    .alerts-box {
-      background-color: var(--alert-bg);
-      border: 1px solid var(--alert-border);
-      color: var(--alert-text);
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    .alerts-box b {
-      display: block;
-      margin-bottom: 4px;
     }
     .price-box {
       margin-top: 20px;
@@ -118,7 +130,21 @@
       border-radius: 10px;
       font-weight: bold;
       text-decoration: none;
-      margin-top: 20px;
+      margin-top: 15px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    .btn-audio {
+      display: block;
+      width: 100%;
+      background-color: var(--audio-btn);
+      color: white;
+      text-align: center;
+      padding: 14px 0;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 10px;
       box-sizing: border-box;
       font-size: 16px;
     }
@@ -136,19 +162,22 @@
 <div class="container">
   <h2>Tabela de Viagens 🧾</h2>
 
-  <div class="alerts-box">
-    <b>🚨 Avisos Importantes:</b>
-    • <b>Noite (23h às 05h):</b> Acréscimo de R$ 5,00 a R$ 10,00.<br>
-    • <b>Praias (Sáb, Dom e Feriados):</b> Saídas das praias +R$ 10,00.<br>
-    • <b>Mercados/Atacados:</b> Feira +R$ 5,00 | Para Pista Preta, Burrama e Eng. Novo +R$ 5,00.<br>
-    • <b>Adicionais:</b> Animais (+R$ 10), Bagagem (+R$ 5) e Excesso de Passageiros (+50%).
+  <div class="voice-instruction">
+    🎙️ <b>Para quem não pode digitar:</b><br>
+    Toque no botão do microfone vermelho ao lado dos campos e fale sua <b>Origem</b> e seu <b>Destino</b>!
   </div>
 
-  <label for="origem">Digite a Origem:</label>
-  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo, Charneca..." oninput="calcularValor()">
+  <label for="origem">Origem:</label>
+  <div class="input-group">
+    <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo..." oninput="calcularValor()">
+    <button type="button" class="btn-mic" onclick="ouvirVoz('origem')">🎤</button>
+  </div>
 
-  <label for="destino">Digite o Destino:</label>
-  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Boa Viagem, Aeroporto..." oninput="calcularValor()">
+  <label for="destino">Destino:</label>
+  <div class="input-group">
+    <input type="text" id="destino" class="campo-texto" placeholder="Ex: Boa Viagem..." oninput="calcularValor()">
+    <button type="button" class="btn-mic" onclick="ouvirVoz('destino')">🎤</button>
+  </div>
 
   <div class="checkbox-group">
     <label><input type="checkbox" id="noite" onchange="calcularValor()"> 🌙 Viagem Noturna (23h às 05h) [+R$ 7,50 méd.]</label>
@@ -166,6 +195,7 @@
   </div>
 
   <a id="btnZap" href="#" class="btn-whatsapp" target="_blank" style="display:none;">Chamar no WhatsApp 🚗</a>
+  <a id="btnAudio" href="#" class="btn-audio" target="_blank" style="display:none;">🎙️ Enviar Pedido por Áudio</a>
 
   <div class="footer-text">
     "POSSO TODAS AS COISAS NAQUELE QUE ME FORTALECE ( Filipenses 4:13 )" 🙏
@@ -173,7 +203,6 @@
 </div>
 
 <script>
-  // ROTAS CADASTRADAS
   const rotas = [
     { origem: "cabo", destino: "jaqueira(gaibu)", valor: 40.00 },
     { origem: "cabo", destino: "pantanal", valor: 45.00 },
@@ -223,107 +252,4 @@
     { origem: "cabo", destino: "p.dos carvalhos", valor: 25.00 },
     { origem: "cabo", destino: "monte em ponte", valor: 40.00 },
     { origem: "p.dos carvalhos", destino: "rosário", valor: 40.00 },
-    { origem: "cabo", destino: "pontezinha", valor: 30.00 },
-    { origem: "cabo", destino: "santo inácio ou vila roca", valor: 13.00 },
-    { origem: "cabo", destino: "alto cemitério ou rua são joão", valor: 13.00 },
-    { origem: "cabo", destino: "espaço s", valor: 25.00 },
-    { origem: "cabo", destino: "pavão", valor: 30.00 },
-    { origem: "cabo", destino: "aymara", valor: 25.00 },
-    { origem: "charneca", destino: "charneca", valor: 15.00 },
-    { origem: "charneca", destino: "cajueiro", valor: 15.00 },
-    { origem: "charneca", destino: "centro geral", valor: 20.00 },
-    { origem: "charneca", destino: "mendo sampaio ou grau", valor: 15.00 },
-    { origem: "charneca", destino: "hotel vai e vem ou pajeú ou lay", valor: 20.00 },
-    { origem: "charneca", destino: "mercês", valor: 25.00 },
-    { origem: "charneca", destino: "castelo recepções", valor: 25.00 },
-    { origem: "charneca", destino: "castelo até o campo", valor: 25.00 },
-    { origem: "charneca", destino: "engenho castelo", valor: 35.00 },
-    { origem: "charneca", destino: "sebastopol", valor: 30.00 },
-    { origem: "charneca", destino: "sabiá", valor: 40.00 },
-    { origem: "charneca", destino: "barragem", valor: 30.00 },
-    { origem: "cajueiro", destino: "centro", valor: 25.00 },
-    { origem: "pirapama", destino: "pirapama", valor: 15.00 },
-    { origem: "cohab", destino: "cohab", valor: 13.00 },
-    { origem: "charnequinha", destino: "s.francisco", valor: 13.00 },
-    { origem: "garapu", destino: "centro", valor: 15.00 },
-    { origem: "shopping", destino: "garapú", valor: 15.00 },
-    { origem: "dom helder", destino: "centro", valor: 20.00 },
-    { origem: "cone", destino: "centro", valor: 15.00 },
-    { origem: "burrama", destino: "centro", valor: 20.00 },
-    { origem: "pista preta", destino: "garapu", valor: 20.00 },
-    { origem: "cabo", destino: "aeroporto", valor: 50.00 },
-    { origem: "cabo", destino: "recife", valor: 70.00 },
-    { origem: "cabo", destino: "joão pessoa", valor: 280.00 },
-    { origem: "cabo", destino: "maceió", valor: 420.00 },
-    { origem: "cabo", destino: "caruaru", valor: 300.00 },
-    { origem: "cabo", destino: "boa viagem", valor: 60.00 }
-  ];
-
-  const SEU_NUMERO_WHATSAPP = "5581999999999"; // Coloque seu número com DDD aqui
-
-  function calcularValor() {
-    // Remove espaços extras e converte para minúsculo para evitar erros de digitação
-    const oInput = document.getElementById("origem").value.trim().toLowerCase();
-    const dInput = document.getElementById("destino").value.trim().toLowerCase();
-    const divValor = document.getElementById("valor");
-    const btnZap = document.getElementById("btnZap");
-
-    if (!oInput || !dInput) {
-      divValor.textContent = "R$ --,--";
-      btnZap.style.display = "none";
-      return;
-    }
-
-    const rotaEncontrada = rotas.find(r => 
-      r.origem.toLowerCase() === oInput && r.destino.toLowerCase() === dInput
-    );
-
-    if (rotaEncontrada) {
-      let valorFinal = rotaEncontrada.valor;
-      let observacoes = [];
-
-      if (document.getElementById("noite").checked) {
-        valorFinal += 7.50;
-        observacoes.push("Taxa Noite");
-      }
-      if (document.getElementById("praiaFDS").checked) {
-        valorFinal += 10.00;
-        observacoes.push("Taxa Praia FDS/Feriado");
-      }
-      if (document.getElementById("mercado").checked) {
-        valorFinal += 5.00;
-        observacoes.push("Taxa Mercado");
-      }
-      if (document.getElementById("animal").checked) {
-        valorFinal += 10.00;
-        observacoes.push("Taxa Animal");
-      }
-      if (document.getElementById("bagagem").checked) {
-        valorFinal += 5.00;
-        observacoes.push("Taxa Bagagem");
-      }
-      if (document.getElementById("excesso").checked) {
-        valorFinal += (rotaEncontrada.valor * 0.50);
-        observacoes.push("Excesso Passageiros");
-      }
-      if (document.getElementById("cartao").checked) {
-        valorFinal += (valorFinal * 0.05);
-        observacoes.push("Pgto Cartão (+5%)");
-      }
-
-      const precoFormatado = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-      divValor.textContent = precoFormatado;
-
-      let textoObs = observacoes.length > 0 ? ` (${observacoes.join(", ")})` : "";
-      const texto = encodeURIComponent(`Olá! Gostaria de pedir uma viagem de *${document.getElementById("origem").value}* para *${document.getElementById("destino").value}*. Valor calculado: *${precoFormatado}*${textoObs}.`);
-      btnZap.href = `https://wa.me/${SEU_NUMERO_WHATSAPP}?text=${texto}`;
-      btnZap.style.display = "block";
-    } else {
-      divValor.textContent = "Sob consulta";
-      btnZap.style.display = "none";
-    }
-  }
-</script>
-
-</body>
-</html>
+    { origem: "cabo", destino: "pontezinha", valor: 30
