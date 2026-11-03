@@ -45,7 +45,6 @@
       margin-bottom: 5px;
       font-size: 14px;
     }
-    /* Caixa de texto livre para digitação */
     input.campo-texto {
       width: 100%;
       padding: 14px;
@@ -146,10 +145,10 @@
   </div>
 
   <label for="origem">Digite a Origem:</label>
-  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo, Charneca, Gaibu..." oninput="calcularValor()">
+  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo, Charneca..." oninput="calcularValor()">
 
   <label for="destino">Digite o Destino:</label>
-  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Aeroporto, Centro, Suape..." oninput="calcularValor()">
+  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Boa Viagem, Aeroporto..." oninput="calcularValor()">
 
   <div class="checkbox-group">
     <label><input type="checkbox" id="noite" onchange="calcularValor()"> 🌙 Viagem Noturna (23h às 05h) [+R$ 7,50 méd.]</label>
@@ -174,7 +173,7 @@
 </div>
 
 <script>
-  // TODAS AS SUAS ROTAS CADASTRADAS
+  // ROTAS CADASTRADAS
   const rotas = [
     { origem: "cabo", destino: "jaqueira(gaibu)", valor: 40.00 },
     { origem: "cabo", destino: "pantanal", valor: 45.00 },
@@ -256,12 +255,14 @@
     { origem: "cabo", destino: "recife", valor: 70.00 },
     { origem: "cabo", destino: "joão pessoa", valor: 280.00 },
     { origem: "cabo", destino: "maceió", valor: 420.00 },
-    { origem: "cabo", destino: "caruaru", valor: 300.00 }
+    { origem: "cabo", destino: "caruaru", valor: 300.00 },
+    { origem: "cabo", destino: "boa viagem", valor: 60.00 }
   ];
 
   const SEU_NUMERO_WHATSAPP = "5581999999999"; // Coloque seu número com DDD aqui
 
   function calcularValor() {
+    // Remove espaços extras e converte para minúsculo para evitar erros de digitação
     const oInput = document.getElementById("origem").value.trim().toLowerCase();
     const dInput = document.getElementById("destino").value.trim().toLowerCase();
     const divValor = document.getElementById("valor");
