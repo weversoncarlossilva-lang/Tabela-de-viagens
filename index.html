@@ -8,7 +8,6 @@
     :root {
       --primary: #25D366;
       --mic-bg: #ea4335;
-      --audio-btn: #128C7E;
       --bg: #f4f6f8;
       --card: #ffffff;
       --text: #333333;
@@ -61,7 +60,6 @@
       border-color: #25D366;
       box-shadow: 0 0 5px rgba(37, 211, 102, 0.3);
     }
-    /* Estilo do Botão Único de Gravação por Voz */
     .btn-big-mic {
       display: flex;
       align-items: center;
@@ -71,13 +69,13 @@
       background-color: var(--mic-bg);
       color: white;
       border: none;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(234, 67, 53, 0.3);
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(234, 67, 53, 0.2);
     }
     .btn-big-mic:active {
       transform: scale(0.98);
@@ -112,8 +110,15 @@
       display: block;
       margin-bottom: 4px;
     }
+    .obs-box {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #d9534f;
+      font-weight: bold;
+      text-align: center;
+    }
     .price-box {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 15px;
       background-color: #eef9f2;
       border: 1px solid #c2eabd;
@@ -167,16 +172,15 @@
     • <b>Adicionais:</b> Animais (+R$ 10), Bagagem (+R$ 5) e Excesso de Passageiros (+50%).
   </div>
 
-  <!-- BOTÃO ÚNICO DE VOZ -->
   <button type="button" class="btn-big-mic" id="btnMic" onclick="ouvirConsultaCompleta()">
-    🎙️ Toque e Fale (Ex: Cabo para Recife)
+    🎙️ Falar Destino (Ex: Cabo Recife)
   </button>
 
-  <label for="origem">Origem:</label>
-  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo..." oninput="calcularValor()">
+  <label for="origem">Digite a Origem:</label>
+  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo, Charneca, Gaibu..." oninput="calcularValor()">
 
-  <label for="destino">Destino:</label>
-  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Boa Viagem..." oninput="calcularValor()">
+  <label for="destino">Digite o Destino:</label>
+  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Recife, Boa Viagem, Suape..." oninput="calcularValor()">
 
   <div class="checkbox-group">
     <label><input type="checkbox" id="noite" onchange="calcularValor()"> 🌙 Viagem Noturna (23h às 05h) [+R$ 7,50 méd.]</label>
@@ -187,6 +191,8 @@
     <label><input type="checkbox" id="bagagem" onchange="calcularValor()"> 🧳 Muita Bagagem [+R$ 5,00]</label>
     <label><input type="checkbox" id="excesso" onchange="calcularValor()"> 👥 Excesso de Passageiros (+50%)</label>
   </div>
+
+  <div id="obsRota" class="obs-box" style="display:none;"></div>
 
   <div class="price-box">
     <span>Valor Total Estimado:</span>
@@ -201,216 +207,602 @@
 </div>
 
 <script>
+  // LISTA COMPLETA DE ROTAS ATUALIZADA
   const rotas = [
-    { origem: "cabo", destino: "jaqueira(gaibu)", valor: 40.00 },
-    { origem: "cabo", destino: "pantanal", valor: 45.00 },
-    { origem: "cabo", destino: "xareu", valor: 35.00 },
-    { origem: "cabo", destino: "enseadas, gaibu", valor: 30.00 },
-    { origem: "cabo", destino: "paiva", valor: 45.00 },
-    { origem: "cabo", destino: "itapuama", valor: 40.00 },
-    { origem: "cabo", destino: "calhetas", valor: 50.00 },
-    { origem: "cabo", destino: "praia de suape", valor: 40.00 },
-    { origem: "cabo", destino: "bar do doido", valor: 60.00 },
-    { origem: "gaibu ou enseadas", destino: "suape", valor: 20.00 },
-    { origem: "itapoama", destino: "suape", valor: 25.00 },
-    { origem: "itapoama", destino: "enseadas, gaibu", valor: 20.00 },
-    { origem: "gaibú", destino: "ponte", valor: 50.00 },
-    { origem: "gaibú", destino: "pontezinha", valor: 60.00 },
-    { origem: "gaibu", destino: "mercês", valor: 55.00 },
-    { origem: "mercês", destino: "suape", valor: 70.00 },
-    { origem: "mercês", destino: "itapoama", valor: 70.00 },
-    { origem: "gaibu", destino: "ipojuca", valor: 60.00 },
-    { origem: "cabo", destino: "p. de galinhas", valor: 70.00 },
-    { origem: "gaibú", destino: "p. de galinhas", valor: 80.00 },
-    { origem: "gaibu", destino: "n.sra ó", valor: 70.00 },
-    { origem: "cabo", destino: "praia carneiros", valor: 150.00 },
-    { origem: "cabo", destino: "serrambi", valor: 100.00 },
-    { origem: "cabo", destino: "tamandaré", valor: 180.00 },
-    { origem: "cabo", destino: "são josé da coroa grande", valor: 220.00 },
-    { origem: "cabo", destino: "maragogi", valor: 250.00 },
-    { origem: "centro", destino: "centro", valor: 13.00 },
-    { origem: "cabo", destino: "mauriti ou bela vista ou cruzeiro", valor: 13.00 },
-    { origem: "cabo", destino: "cohab ou rua do açude", valor: 13.00 },
-    { origem: "cabo", destino: "são francisco ou charnequinha", valor: 13.00 },
-    { origem: "cabo", destino: "garapu", valor: 15.00 },
-    { origem: "cabo", destino: "pirapama ou charneca ou novo horizonte ou barbalho 1e2", valor: 20.00 },
-    { origem: "cabo", destino: "tururú", valor: 25.00 },
-    { origem: "cabo", destino: "charneca rua 2 embaixo", valor: 20.00 },
-    { origem: "cabo", destino: "charneca antiga estação", valor: 20.00 },
-    { origem: "cabo", destino: "sítio de panta", valor: 20.00 },
-    { origem: "cabo", destino: "santa rosa", valor: 20.00 },
-    { origem: "cabo", destino: "matinha/mangueira", valor: 25.00 },
-    { origem: "cabo", destino: "cd americana", valor: 25.00 },
-    { origem: "cabo", destino: "grau ou mista", valor: 13.00 },
-    { origem: "cabo", destino: "destilaria ou vila social", valor: 13.00 },
-    { origem: "cabo", destino: "pista preta", valor: 20.00 },
-    { origem: "cabo", destino: "burrama", valor: 25.00 },
-    { origem: "cabo", destino: "alto da macaíba", valor: 25.00 },
-    { origem: "cabo", destino: "cone", valor: 20.00 },
-    { origem: "cabo", destino: "p.dos carvalhos", valor: 25.00 },
-    { origem: "cabo", destino: "monte em ponte", valor: 40.00 },
-    { origem: "p.dos carvalhos", destino: "rosário", valor: 40.00 },
-    { origem: "cabo", destino: "pontezinha", valor: 30.00 },
-    { origem: "cabo", destino: "santo inácio ou vila roca", valor: 13.00 },
-    { origem: "cabo", destino: "alto cemitério ou rua são joão", valor: 13.00 },
-    { origem: "cabo", destino: "espaço s", valor: 25.00 },
-    { origem: "cabo", destino: "pavão", valor: 30.00 },
-    { origem: "cabo", destino: "aymara", valor: 25.00 },
-    { origem: "charneca", destino: "charneca", valor: 15.00 },
-    { origem: "charneca", destino: "cajueiro", valor: 15.00 },
-    { origem: "charneca", destino: "centro geral", valor: 20.00 },
-    { origem: "charneca", destino: "mendo sampaio ou grau", valor: 15.00 },
-    { origem: "charneca", destino: "hotel vai e vem ou pajeú ou lay", valor: 20.00 },
-    { origem: "charneca", destino: "mercês", valor: 25.00 },
-    { origem: "charneca", destino: "castelo recepções", valor: 25.00 },
-    { origem: "charneca", destino: "castelo até o campo", valor: 25.00 },
-    { origem: "charneca", destino: "engenho castelo", valor: 35.00 },
-    { origem: "charneca", destino: "sebastopol", valor: 30.00 },
-    { origem: "charneca", destino: "sabiá", valor: 40.00 },
-    { origem: "charneca", destino: "barragem", valor: 30.00 },
-    { origem: "cajueiro", destino: "centro", valor: 25.00 },
-    { origem: "pirapama", destino: "pirapama", valor: 15.00 },
-    { origem: "cohab", destino: "cohab", valor: 13.00 },
-    { origem: "charnequinha", destino: "s.francisco", valor: 13.00 },
-    { origem: "garapu", destino: "centro", valor: 15.00 },
-    { origem: "shopping", destino: "garapú", valor: 15.00 },
-    { origem: "dom helder", destino: "centro", valor: 20.00 },
-    { origem: "cone", destino: "centro", valor: 15.00 },
-    { origem: "burrama", destino: "centro", valor: 20.00 },
-    { origem: "pista preta", destino: "garapu", valor: 20.00 },
-    { origem: "cabo", destino: "aeroporto", valor: 50.00 },
-    { origem: "cabo", destino: "recife", valor: 70.00 },
-    { origem: "cabo", destino: "joão pessoa", valor: 280.00 },
-    { origem: "cabo", destino: "maceió", valor: 420.00 },
-    { origem: "cabo", destino: "caruaru", valor: 300.00 },
-    { origem: "cabo", destino: "boa viagem", valor: 60.00 }
-  ];
-
-  const SEU_NUMERO_WHATSAPP = "5581999999999"; // Coloque seu número com DDD aqui
-
-  // Função inteligente que escuta a frase completa e separa Origem e Destino
-  function ouvirConsultaCompleta() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Seu navegador não suporta reconhecimento de voz. Tente usar o Google Chrome.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    const btnMic = document.getElementById("btnMic");
-
-    recognition.onstart = function() {
-      btnMic.style.backgroundColor = "#ff9800";
-      btnMic.innerHTML = "👂 Ouvindo... Fale a origem e destino!";
-    };
-
-    recognition.onresult = function(event) {
-      let textoFalado = event.results[0][0].transcript.toLowerCase().replace('.', '');
-      
-      // Tenta separar a frase usando palavras-chave comuns como "para", "até" ou "a"
-      let partes = [];
-      if (textoFalado.includes(" para ")) {
-        partes = textoFalado.split(" para ");
-      } else if (textoFalado.includes(" até ")) {
-        partes = textoFalado.split(" até ");
-      } else if (textoFalado.includes(" pro ")) {
-        partes = textoFalado.split(" pro ");
-      } else if (textoFalado.includes(" pra ")) {
-        partes = textoFalado.split(" pra ");
-      }
-
-      if (partes.length >= 2) {
-        // Limpa palavras extras comuns no começo (ex: "quero ir do", "sair de")
-        let origemLida = partes[0].replace("quero ir do", "").replace("sair de", "").replace("do", "").replace("de", "").trim();
-        let destinoLido = partes[1].replace("para", "").replace("o", "").replace("a", "").trim();
-
-        document.getElementById("origem").value = origemLida.charAt(0).toUpperCase() + origemLida.slice(1);
-        document.getElementById("destino").value = destinoLido.charAt(0).toUpperCase() + destinoLido.slice(1);
-        
-        calcularValor();
-      } else {
-        alert("Não consegui separar a origem e o destino. Tente falar: 'Cabo para Recife'");
-      }
-
-      btnMic.style.backgroundColor = "#ea4335";
-      btnMic.innerHTML = "🎙️ Toque e Fale (Ex: Cabo para Recife)";
-    };
-
-    recognition.onerror = function() {
-      alert("Erro ao capturar áudio. Tente novamente.");
-      btnMic.style.backgroundColor = "#ea4335";
-      btnMic.innerHTML = "🎙️ Toque e Fale (Ex: Cabo para Recife)";
-    };
-
-    recognition.start();
-  }
-
-  function calcularValor() {
-    const oInput = document.getElementById("origem").value.trim().toLowerCase();
-    const dInput = document.getElementById("destino").value.trim().toLowerCase();
-    const divValor = document.getElementById("valor");
-    const btnZap = document.getElementById("btnZap");
-
-    if (!oInput || !dInput) {
-      divValor.textContent = "R$ --,--";
-      btnZap.style.display = "none";
-      return;
-    }
-
-    const rotaEncontrada = rotas.find(r => 
-      r.origem.toLowerCase() === oInput && r.destino.toLowerCase() === dInput
-    );
-
-    if (rotaEncontrada) {
-      let valorFinal = rotaEncontrada.valor;
-      let observacoes = [];
-
-      if (document.getElementById("noite").checked) {
-        valorFinal += 7.50;
-        observacoes.push("Taxa Noite");
-      }
-      if (document.getElementById("praiaFDS").checked) {
-        valorFinal += 10.00;
-        observacoes.push("Taxa Praia FDS/Feriado");
-      }
-      if (document.getElementById("mercado").checked) {
-        valorFinal += 5.00;
-        observacoes.push("Taxa Mercado");
-      }
-      if (document.getElementById("animal").checked) {
-        valorFinal += 10.00;
-        observacoes.push("Taxa Animal");
-      }
-      if (document.getElementById("bagagem").checked) {
-        valorFinal += 5.00;
-        observacoes.push("Taxa Bagagem");
-      }
-      if (document.getElementById("excesso").checked) {
-        valorFinal += (rotaEncontrada.valor * 0.50);
-        observacoes.push("Excesso Passageiros");
-      }
-      if (document.getElementById("cartao").checked) {
-        valorFinal += (valorFinal * 0.05);
-        observacoes.push("Pgto Cartão (+5%)");
-      }
-
-      const precoFormatado = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-      divValor.textContent = precoFormatado;
-
-      let textoObs = observacoes.length > 0 ? ` (${observacoes.join(", ")})` : "";
-      const texto = encodeURIComponent(`Olá! Gostaria de pedir uma viagem de *${document.getElementById("origem").value}* para *${document.getElementById("destino").value}*. Valor calculado: *${precoFormatado}*${textoObs}.`);
-      btnZap.href = `https://wa.me/${SEU_NUMERO_WHATSAPP}?text=${texto}`;
-      btnZap.style.display = "block";
-    } else {
-      divValor.textContent = "Sob consulta";
-      btnZap.style.display = "none";
-    }
-  }
-</script>
-
-</body>
-</html>
+    { origem: "Cabo de Santo Agostinho", destino: "Jaqueira (Gaibu)", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pantanal", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Xaréu", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Enseadas", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Gaibu", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Paiva", valor: 45, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Itapuama", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Calhetas", valor: 50, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Praia de Suape", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Bar do Doido", valor: 60, obs: "" },
+    { origem: "Gaibu", destino: "Suape", valor: 20, obs: "" },
+    { origem: "Enseadas", destino: "Suape", valor: 20, obs: "" },
+    { origem: "Itapuama", destino: "Suape", valor: 25, obs: "" },
+    { origem: "Itapuama", destino: "Enseadas", valor: 20, obs: "" },
+    { origem: "Itapuama", destino: "Gaibu", valor: 20, obs: "" },
+    { origem: "Gaibu", destino: "Ponte", valor: 50, obs: "" },
+    { origem: "Gaibu", destino: "Pontezinha", valor: 60, obs: "" },
+    { origem: "Gaibu", destino: "Mercês", valor: 55, obs: "" },
+    { origem: "Mercês", destino: "Suape", valor: 70, obs: "" },
+    { origem: "Mercês", destino: "Itapuama", valor: 70, obs: "" },
+    { origem: "Gaibu", destino: "Ipojuca", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Porto de Galinhas", valor: 70, obs: "" },
+    { origem: "Gaibu", destino: "Porto de Galinhas", valor: 80, obs: "" },
+    { origem: "Gaibu", destino: "Nossa Senhora do Ó", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Praia dos Carneiros", valor: 150, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Serrambi", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Tamandaré", valor: 180, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "São José da Coroa Grande", valor: 220, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Maragogi", valor: 250, obs: "" },
+    { origem: "Centro", destino: "Centro", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Mauriti", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Bela Vista", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Cruzeiro", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "COHAB", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Rua do Açude", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "São Francisco", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Charnequinha", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Garapu", valor: 15, obs: "Até o Segundo Modelo" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pirapama", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Charneca", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Novo Horizonte", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Barbalho 1", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Barbalho 2", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Tururú", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Rua 2 (parte de baixo), Charneca", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Antiga Estação, Charneca", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Sítio de Panta", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Santa Rosa", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Matinha", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Mangueira", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Centro de Distribuição Americanas", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Grau Técnico", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Mista", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Destilaria", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Vila Social", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pista Preta", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Burrama", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Alto da Macaíba", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Cone", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Ponte dos Carvalhos", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Monte em Ponte", valor: 40, obs: "" },
+    { origem: "Ponte dos Carvalhos", destino: "Rosário", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pontezinha", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Santo Inácio", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Vila Roca", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Alto Cemitério", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Rua São João", valor: 13, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Espaço S", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pavão", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Aymara", valor: 25, obs: "" },
+    { origem: "Cruzeiro", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Cruzeiro", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Cruzeiro", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Cruzeiro", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Mauriti", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Mauriti", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Mauriti", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Mauriti", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Malaquias", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Malaquias", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Malaquias", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Malaquias", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Bela Vista", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Bela Vista", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Bela Vista", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Bela Vista", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Alto Cemitério", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Alto Cemitério", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Alto Cemitério", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Alto Cemitério", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Bairro São Francisco", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Bairro São Francisco", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Bairro São Francisco", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Bairro São Francisco", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Vila Roca", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Charneca", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Cajueiro", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Centro", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Mendo Sampaio", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Grau Técnico", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Hotel Vai e Vem", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Pajeú", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Lay", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Mercês", valor: 25, obs: "" },
+    { origem: "Charneca", destino: "Castelo Recepções", valor: 25, obs: "" },
+    { origem: "Charneca", destino: "Castelo (até o campo)", valor: 25, obs: "" },
+    { origem: "Charneca", destino: "Engenho Castelo", valor: 35, obs: "" },
+    { origem: "Charneca", destino: "Sebastopol", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Barragem", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Sabiá", valor: 40, obs: "" },
+    { origem: "Charneca", destino: "Destilaria", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Vila Social", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Vila Roca", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Santo Inácio", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Pirapama", valor: 13, obs: "" },
+    { origem: "Charneca", destino: "Novo Horizonte", valor: 13, obs: "" },
+    { origem: "Charneca", destino: "Barbalho 1", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Barbalho 2", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Tururú", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Sítio de Panta", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Cida Park", valor: 15, obs: "" },
+    { origem: "Charneca", destino: "Bela Vista", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Bairro", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Malaquias", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Mauriti", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Cruzeiro", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "COHAB", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Rua do Açude", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Praça Téo Silva", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Charnequinha", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Garapu", valor: 22, obs: "Até o Segundo Modelo" },
+    { origem: "Charneca", destino: "Águia América", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Engenho Serra", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Engenho Novo (até a escola)", valor: 25, obs: "" },
+    { origem: "Charneca", destino: "Engenho Novo (depois da escola)", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Alto do Sol", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Espaço S", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Pista Preta", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Burrama", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Algodoais", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Serraria", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Ponte dos Carvalhos", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Rosário", valor: 28, obs: "" },
+    { origem: "Charneca", destino: "Cone", valor: 20, obs: "" },
+    { origem: "Charneca", destino: "Centro de Distribuição Americanas", valor: 30, obs: "" },
+    { origem: "Charneca", destino: "Monte em Ponte", valor: 50, obs: "" },
+    { origem: "Charneca", destino: "Pontezinha", valor: 40, obs: "" },
+    { origem: "Charneca", destino: "Massangana", valor: 40, obs: "" },
+    { origem: "Charneca", destino: "Complexo de Suape", valor: 45, obs: "Acrescentar pedágio" },
+    { origem: "Charneca", destino: "Deca", valor: 35, obs: "Acrescentar pedágio" },
+    { origem: "Charneca", destino: "Acher", valor: 35, obs: "Acrescentar pedágio" },
+    { origem: "Charneca", destino: "Sulog", valor: 35, obs: "Acrescentar pedágio" },
+    { origem: "Charneca", destino: "Ipojuca", valor: 45, obs: "" },
+    { origem: "Charneca", destino: "Nossa Senhora do Ó", valor: 70, obs: "" },
+    { origem: "Charneca", destino: "Porto de Galinhas", valor: 80, obs: "" },
+    { origem: "Charneca", destino: "Shopping Guararapes", valor: 55, obs: "" },
+    { origem: "Charneca", destino: "Shopping Recife", valor: 70, obs: "" },
+    { origem: "Charneca", destino: "RioMar", valor: 80, obs: "" },
+    { origem: "Charneca", destino: "Jaboatão Velho", valor: 90, obs: "" },
+    { origem: "Charneca", destino: "Candeias", valor: 55, obs: "" },
+    { origem: "Charneca", destino: "Barra de Jangada", valor: 50, obs: "" },
+    { origem: "Charneca", destino: "Boa Viagem", valor: 70, obs: "" },
+    { origem: "Charneca", destino: "Imbiribeira", valor: 70, obs: "" },
+    { origem: "Charneca", destino: "Casa Amarela", valor: 90, obs: "" },
+    { origem: "Charneca", destino: "Camaragibe", valor: 100, obs: "" },
+    { origem: "Charneca", destino: "São Lourenço", valor: 110, obs: "" },
+    { origem: "Charneca", destino: "Olinda", valor: 100, obs: "" },
+    { origem: "Charneca", destino: "Paulista", valor: 110, obs: "" },
+    { origem: "Charneca", destino: "Terminal Integrado de Passageiros (TIP)", valor: 110, obs: "" },
+    { origem: "Charneca", destino: "Enseadas", valor: 55, obs: "" },
+    { origem: "Charneca", destino: "Gaibu", valor: 55, obs: "" },
+    { origem: "Charneca", destino: "Itapuama", valor: 60, obs: "" },
+    { origem: "Charneca", destino: "Suape", valor: 60, obs: "" },
+    { origem: "Charneca", destino: "Paiva", valor: 60, obs: "Acrescentar pedágio" },
+    { origem: "Cajueiro", destino: "Centro", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Barbalho 1", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Barbalho 2", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Novo Horizonte", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Sítio de Panta", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Mendo Sampaio", valor: 17, obs: "" },
+    { origem: "Cajueiro", destino: "Grau Técnico", valor: 17, obs: "" },
+    { origem: "Cajueiro", destino: "Hotel Vai e Vem", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Lay", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Pajeú", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Mercês", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Destilaria", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Bairro São Francisco", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Charnequinha", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "COHAB", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Rua do Açude", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Santo Inácio", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Vila Social", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Tururú", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Pirapama", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Garapu", valor: 28, obs: "" },
+    { origem: "Cajueiro", destino: "Shopping Costa Dourada", valor: 28, obs: "" },
+    { origem: "Cajueiro", destino: "Rosário", valor: 30, obs: "" },
+    { origem: "Cajueiro", destino: "Algodoais", valor: 35, obs: "" },
+    { origem: "Cajueiro", destino: "Massangana", valor: 40, obs: "" },
+    { origem: "Cajueiro", destino: "Ipojuca", valor: 50, obs: "" },
+    { origem: "Cajueiro", destino: "Águia América", valor: 25, obs: "" },
+    { origem: "Cajueiro", destino: "Cida Park", valor: 20, obs: "" },
+    { origem: "Cajueiro", destino: "Espaço S", valor: 35, obs: "" },
+    { origem: "Pirapama", destino: "Pirapama", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Grau Técnico", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Mista", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Novo Horizonte", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Sítio de Panta", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Charneca", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Antiga Estação", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Cida Park", valor: 15, obs: "" },
+    { origem: "Pirapama", destino: "Hotel Vai e Vem", valor: 25, obs: "" },
+    { origem: "Pirapama", destino: "Lay", valor: 25, obs: "" },
+    { origem: "Pirapama", destino: "Pajeú", valor: 25, obs: "" },
+    { origem: "Pirapama", destino: "Mercês", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Destilaria", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Santo Inácio", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Vila Social", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Vila Roca", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Garapu", valor: 25, obs: "Até o Segundo Modelo" },
+    { origem: "Pirapama", destino: "Engenho Serra", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Cruzeiro", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Charnequinha", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "COHAB", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Rua do Açude", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Bela Vista", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Mauriti", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Bairro", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Malaquias", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Praça Téo Silva", valor: 20, obs: "" },
+    { origem: "Pirapama", destino: "Rosário", valor: 28, obs: "" },
+    { origem: "Pirapama", destino: "Serraria", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Cone", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Pista Preta", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Algodoais", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Espaço S", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Ponte dos Carvalhos", valor: 40, obs: "" },
+    { origem: "Pirapama", destino: "Centro de Distribuição Americanas", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Pontezinha", valor: 45, obs: "" },
+    { origem: "Pirapama", destino: "Massangana", valor: 35, obs: "" },
+    { origem: "Pirapama", destino: "Ipojuca", valor: 45, obs: "" },
+    { origem: "Pirapama", destino: "Barbalho 1", valor: 17, obs: "" },
+    { origem: "Pirapama", destino: "Barbalho 2", valor: 17, obs: "" },
+    { origem: "Pirapama", destino: "Suape", valor: 55, obs: "" },
+    { origem: "Pirapama", destino: "Paiva", valor: 55, obs: "Acrescentar pedágio" },
+    { origem: "Pirapama", destino: "Enseadas", valor: 50, obs: "" },
+    { origem: "Pirapama", destino: "Gaibu", valor: 50, obs: "" },
+    { origem: "Pirapama", destino: "Castelo (até o campo)", valor: 30, obs: "" },
+    { origem: "Pirapama", destino: "Castelo Recepções", valor: 25, obs: "" },
+    { origem: "Pirapama", destino: "Engenho Castelo", valor: 40, obs: "" },
+    { origem: "Pirapama", destino: "Complexo de Suape", valor: 50, obs: "Acrescentar pedágio" },
+    { origem: "Pirapama", destino: "Deca", valor: 40, obs: "Acrescentar pedágio" },
+    { origem: "Pirapama", destino: "Acher", valor: 40, obs: "Acrescentar pedágio" },
+    { origem: "Pirapama", destino: "Sulog", valor: 40, obs: "Acrescentar pedágio" },
+    { origem: "COHAB", destino: "COHAB", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Centro", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Shopping Costa Dourada", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Destilaria", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Santo Inácio", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Vila Roca", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Vila Social", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Hospital Infantil", valor: 13, obs: "" },
+    { origem: "COHAB", destino: "Bela Vista", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Cruzeiro", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Mauriti", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Bairro São Francisco", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Charnequinha", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Mista", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Grau Técnico", valor: 15, obs: "" },
+    { origem: "COHAB", destino: "Garapu", valor: 15, obs: "Até o Segundo Modelo" },
+    { origem: "COHAB", destino: "Pirapama", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Charneca", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Novo Horizonte", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Barbalho 1", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Barbalho 2", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Tururú", valor: 25, obs: "" },
+    { origem: "COHAB", destino: "Engenho Novo (até a escola)", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Engenho Novo (depois da escola)", valor: 23, obs: "" },
+    { origem: "COHAB", destino: "Alto do Sol", valor: 23, obs: "" },
+    { origem: "COHAB", destino: "Cida Park", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Engenho Serra", valor: 35, obs: "" },
+    { origem: "COHAB", destino: "Ponte dos Carvalhos", valor: 28, obs: "" },
+    { origem: "COHAB", destino: "Monte em Ponte", valor: 40, obs: "" },
+    { origem: "COHAB", destino: "Itapuama", valor: 40, obs: "" },
+    { origem: "COHAB", destino: "Suape", valor: 40, obs: "" },
+    { origem: "COHAB", destino: "Enseadas", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Gaibu", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Paiva", valor: 45, obs: "Acrescentar pedágio" },
+    { origem: "COHAB", destino: "Rosário", valor: 20, obs: "" },
+    { origem: "COHAB", destino: "Águia América", valor: 25, obs: "" },
+    { origem: "COHAB", destino: "Espaço S", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Hotel Vai e Vem", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Lay", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Pajeú", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Mercês", valor: 35, obs: "" },
+    { origem: "COHAB", destino: "Castelo Recepções", valor: 30, obs: "" },
+    { origem: "COHAB", destino: "Castelo (até o campo)", valor: 35, obs: "" },
+    { origem: "COHAB", destino: "Engenho Castelo", valor: 55, obs: "" },
+    { origem: "COHAB", destino: "Ipojuca", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Destilaria", valor: 17, obs: "" },
+    { origem: "Charnequinha", destino: "Vila Roca", valor: 17, obs: "" },
+    { origem: "Charnequinha", destino: "Santo Inácio", valor: 17, obs: "" },
+    { origem: "Charnequinha", destino: "Bela Vista", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Cruzeiro", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "COHAB", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Mauriti", valor: 15, obs: "" },
+    { origem: "Charnequinha", destino: "Bairro São Francisco", valor: 13, obs: "" },
+    { origem: "Charnequinha", destino: "Shopping Costa Dourada", valor: 17, obs: "" },
+    { origem: "Charnequinha", destino: "Engenho Novo (até a escola)", valor: 20, obs: "" },
+    { origem: "Charnequinha", destino: "Engenho Novo (depois da escola)", valor: 25, obs: "" },
+    { origem: "Charnequinha", destino: "Alto do Sol", valor: 25, obs: "" },
+    { origem: "Charnequinha", destino: "Novo Horizonte", valor: 18, obs: "" },
+    { origem: "Charnequinha", destino: "Charneca", valor: 18, obs: "" },
+    { origem: "Charnequinha", destino: "Pirapama", valor: 18, obs: "" },
+    { origem: "Charnequinha", destino: "Barbalho 1", valor: 18, obs: "" },
+    { origem: "Charnequinha", destino: "Barbalho 2", valor: 18, obs: "" },
+    { origem: "Charnequinha", destino: "Sítio de Panta", valor: 23, obs: "" },
+    { origem: "Charnequinha", destino: "Tururú", valor: 23, obs: "" },
+    { origem: "Charnequinha", destino: "Rosário", valor: 20, obs: "" },
+    { origem: "Charnequinha", destino: "Charneca (Antiga Estação)", valor: 23, obs: "" },
+    { origem: "Charnequinha", destino: "Ponte dos Carvalhos", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Monte em Ponte", valor: 40, obs: "" },
+    { origem: "Charnequinha", destino: "Pontezinha", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Algodoais", valor: 25, obs: "" },
+    { origem: "Charnequinha", destino: "Enseadas", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Gaibu", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Suape", valor: 45, obs: "" },
+    { origem: "Charnequinha", destino: "Itapuama", valor: 45, obs: "" },
+    { origem: "Charnequinha", destino: "Paiva", valor: 50, obs: "Acrescentar pedágio" },
+    { origem: "Charnequinha", destino: "Águia América", valor: 25, obs: "" },
+    { origem: "Charnequinha", destino: "Cida Park", valor: 20, obs: "" },
+    { origem: "Charnequinha", destino: "Espaço S", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Rua do Açude", valor: 13, obs: "" },
+    { origem: "Charnequinha", destino: "Hotel Vai e Vem", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Lay", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Pajeú", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Mercês", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Castelo Recepções", valor: 30, obs: "" },
+    { origem: "Charnequinha", destino: "Castelo (até o campo)", valor: 35, obs: "" },
+    { origem: "Charnequinha", destino: "Engenho Castelo", valor: 55, obs: "" },
+    { origem: "Charnequinha", destino: "Ipojuca", valor: 40, obs: "" },
+    { origem: "Garapu", destino: "Centro", valor: 15, obs: "" },
+    { origem: "Garapu", destino: "Rosário", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Cruzeiro", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Mauriti", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Malaquias", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Bela Vista", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Alto Cemitério", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Torrinha", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Charnequinha", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Bairro São Francisco", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Grau Técnico", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Mista", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "COHAB", valor: 18, obs: "" },
+    { origem: "Garapu", destino: "Algodoais", valor: 25, obs: "" },
+    { origem: "Garapu", destino: "Ponte dos Carvalhos", valor: 30, obs: "" },
+    { origem: "Garapu", destino: "Mercês", valor: 40, obs: "" },
+    { origem: "Garapu", destino: "Castelo Recepções", valor: 35, obs: "" },
+    { origem: "Garapu", destino: "Castelo (até o campo)", valor: 40, obs: "" },
+    { origem: "Garapu", destino: "Engenho Castelo", valor: 55, obs: "" },
+    { origem: "Garapu", destino: "Charneca", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Novo Horizonte", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Pirapama", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Barbalho 1", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Barbalho 2", valor: 20, obs: "" },
+    { origem: "Garapu", destino: "Massangana", valor: 30, obs: "" },
+    { origem: "Garapu", destino: "Enseadas", valor: 35, obs: "" },
+    { origem: "Garapu", destino: "Gaibu", valor: 35, obs: "" },
+    { origem: "Garapu", destino: "Itapuama", valor: 45, obs: "" },
+    { origem: "Garapu", destino: "Suape", valor: 45, obs: "" },
+    { origem: "Garapu", destino: "Paiva", valor: 50, obs: "Acrescentar pedágio" },
+    { origem: "Garapu", destino: "Águia América", valor: 30, obs: "" },
+    { origem: "Garapu", destino: "Cida Park", valor: 25, obs: "" },
+    { origem: "Garapu", destino: "Espaço S", valor: 35, obs: "" },
+    { origem: "Garapu", destino: "Engenho Novo (até a escola)", valor: 25, obs: "" },
+    { origem: "Garapu", destino: "Engenho Novo (depois da escola)", valor: 28, obs: "" },
+    { origem: "Garapu", destino: "Alto do Sol", valor: 28, obs: "" },
+    { origem: "Garapu", destino: "Ipojuca", valor: 40, obs: "" },
+    { origem: "Engenho Novo (até a escola)", destino: "Centro", valor: 15, obs: "" },
+    { origem: "Engenho Novo (depois da escola)", destino: "Centro", valor: 18, obs: "" },
+    { origem: "Alto do Sol", destino: "Centro", valor: 18, obs: "" },
+    { origem: "Engenho Novo", destino: "Mista", valor: 20, obs: "" },
+    { origem: "Engenho Novo", destino: "Charneca", valor: 25, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Novo Horizonte", valor: 25, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Pirapama", valor: 25, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Barbalho 1", valor: 25, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Barbalho 2", valor: 25, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Shopping Costa Dourada", valor: 25, obs: "" },
+    { origem: "Engenho Novo", destino: "Rosário", valor: 30, obs: "" },
+    { origem: "Engenho Novo", destino: "Serraria", valor: 35, obs: "" },
+    { origem: "Engenho Novo", destino: "Ponte dos Carvalhos", valor: 30, obs: "" },
+    { origem: "Engenho Novo (Antigo Bar da Piaba/depois da escola/Alto do Sol)", destino: "Ponte dos Carvalhos", valor: 35, obs: "Tarifa geral" },
+    { origem: "Engenho Novo", destino: "Enseadas", valor: 40, obs: "" },
+    { origem: "Engenho Novo", destino: "Gaibu", valor: 40, obs: "" },
+    { origem: "Engenho Novo", destino: "Suape", valor: 50, obs: "" },
+    { origem: "Engenho Novo", destino: "Itapuama", valor: 50, obs: "" },
+    { origem: "Engenho Novo", destino: "Algodoais", valor: 30, obs: "" },
+    { origem: "Engenho Novo", destino: "Hotel Vai e Vem", valor: 35, obs: "" },
+    { origem: "Engenho Novo", destino: "Lay", valor: 35, obs: "" },
+    { origem: "Engenho Novo", destino: "Pajeú", valor: 35, obs: "" },
+    { origem: "Engenho Novo", destino: "Mercês", valor: 40, obs: "" },
+    { origem: "Engenho Novo", destino: "Castelo Recepções", valor: 30, obs: "" },
+    { origem: "Engenho Novo", destino: "Castelo (até o campo)", valor: 35, obs: "" },
+    { origem: "Engenho Novo", destino: "Engenho Castelo", valor: 50, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Garapu", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Cajueiro", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Destilaria", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Santo Inácio", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Vila Social", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Bairro São Francisco", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Sapucaia", valor: 18, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Charnequinha", valor: 18, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Rosário", valor: 15, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Novo Horizonte", valor: 20, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Charneca", valor: 20, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Pirapama", valor: 20, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Barbalho 1", valor: 20, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Barbalho 2", valor: 20, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Tururú", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Sítio de Panta", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Charneca (Antiga Estação)", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Serraria", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Pista Preta", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Algodoais", valor: 25, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Burrama", valor: 28, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Ponte dos Carvalhos", valor: 35, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Mercês", valor: 40, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Castelo (até o campo)", valor: 40, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Engenho Castelo", valor: 60, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Engenho Sabiá", valor: 60, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Sabiá", valor: 60, obs: "" },
+    { origem: "Shopping Costa Dourada", destino: "Massangana", valor: 30, obs: "" },
+    { origem: "Dom Helder", destino: "Centro", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Mauriti", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Malaquias", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Cruzeiro", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Bela Vista", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Santo Inácio", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Vila Roca", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Pista Preta", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Destilaria", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Charnequinha", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Bairro São Francisco", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "COHAB", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Garapu", valor: 20, obs: "" },
+    { origem: "Dom Helder", destino: "Burrama", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Rosário", valor: 30, obs: "" },
+    { origem: "Dom Helder", destino: "Pirapama", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Charneca", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Novo Horizonte", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Barbalho 1", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Barbalho 2", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Engenho Novo", valor: 25, obs: "" },
+    { origem: "Dom Helder", destino: "Mercês", valor: 40, obs: "" },
+    { origem: "Dom Helder", destino: "Gaibu", valor: 45, obs: "" },
+    { origem: "Dom Helder", destino: "Ipojuca", valor: 45, obs: "" },
+    { origem: "Cone", destino: "Centro", valor: 15, obs: "" },
+    { origem: "Cone", destino: "COHAB", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Cruzeiro", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Bela Vista", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Mauriti", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Malaquias", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Bairro São Francisco", valor: 20, obs: "" },
+    { origem: "Cone", destino: "Charnequinha", valor: 20, obs: "" },
+    { origem: "Cone", destino: "Charneca", valor: 23, obs: "" },
+    { origem: "Cone", destino: "Pirapama", valor: 23, obs: "" },
+    { origem: "Cone", destino: "Barbalho 1", valor: 23, obs: "" },
+    { origem: "Cone", destino: "Barbalho 2", valor: 23, obs: "" },
+    { origem: "Cone", destino: "Novo Horizonte", valor: 23, obs: "" },
+    { origem: "Cone", destino: "Ponte", valor: 20, obs: "" },
+    { origem: "Cone", destino: "Pista Preta", valor: 18, obs: "" },
+    { origem: "Cone", destino: "Garapu", valor: 20, obs: "" },
+    { origem: "Cone", destino: "Shopping Costa Dourada", valor: 20, obs: "" },
+    { origem: "Burrama", destino: "Centro", valor: 20, obs: "" },
+    { origem: "Burrama", destino: "Charneca", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Barbalho 1", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Barbalho 2", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Pirapama", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Novo Horizonte", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Ponte", valor: 30, obs: "" },
+    { origem: "Burrama", destino: "Bairro São Francisco", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Charnequinha", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "COHAB", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Cruzeiro", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Mauriti", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Bela Vista", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Garapu", valor: 25, obs: "" },
+    { origem: "Burrama", destino: "Shopping Costa Dourada", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "COHAB", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Bela Vista", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Mauriti", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Cruzeiro", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Malaquias", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Garapu", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Bairro São Francisco", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Charnequinha", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Charneca", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Pirapama", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Novo Horizonte", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Barbalho 1", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Barbalho 2", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Ponte", valor: 30, obs: "" },
+    { origem: "Pista Preta", destino: "Shopping Costa Dourada", valor: 20, obs: "" },
+    { origem: "Pista Preta", destino: "Rosário", valor: 25, obs: "" },
+    { origem: "Pista Preta", destino: "Enseadas", valor: 40, obs: "" },
+    { origem: "Pista Preta", destino: "Gaibu", valor: 40, obs: "" },
+    { origem: "Pista Preta", destino: "Itapuama", valor: 45, obs: "" },
+    { origem: "Pista Preta", destino: "Suape", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Tapugi", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Rocha Velha", valor: 50, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Liberdade", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Pau Santo", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Arariba", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho São Salvador", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Gurjaú", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Usina Bom Jesus", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Bica de Bigode", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Mata", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Juçaral", valor: 110, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Ipiranga", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Pantorra", valor: 90, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Universo", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Algodoais", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Sabiá", valor: 50, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Castelo", valor: 50, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Castelo (até o campo)", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Sebastopol", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Massangana", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Mercês", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Utinga", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Engenho Esmeralda", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Rosário", valor: 20, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Serraria", valor: 25, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Coca-Cola de Serraria", valor: 30, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Ipojuca", valor: 35, obs: "" },
+    { origem: "Ipojuca", destino: "Ponte", valor: 55, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Acher", valor: 25, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Deca", valor: 25, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Sulog", valor: 25, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Refinaria", valor: 35, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Porto de Suape", valor: 40, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "ELOG Suape", valor: 40, obs: "Acrescentar pedágio" },
+    { origem: "Cabo de Santo Agostinho", destino: "Nossa Senhora do Ó", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Camela", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Sirinhaém", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Barra de Sirinhaém", valor: 120, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Rio Formoso", valor: 130, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Barreiros", valor: 160, obs: "" },
+    { origem: "Mercês", destino: "Ponte dos Carvalhos", valor: 50, obs: "" },
+    { origem: "Mercês", destino: "Pontezinha", valor: 55, obs: "" },
+    { origem: "Mercês", destino: "Prazeres", valor: 70, obs: "" },
+    { origem: "Mercês", destino: "Recife", valor: 90, obs: "" },
+    { origem: "Mercês", destino: "Boa Viagem", valor: 80, obs: "" },
+    { origem: "Mercês", destino: "Ipojuca", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Escada", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Ribeirão", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Gameleira", valor: 130, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Palmares", valor: 170, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Água Preta", valor: 190, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Maceió", valor: 420, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Cortez", valor: 160, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Bonito", valor: 210, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Frexeiras", valor: 110, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Primavera", valor: 120, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Amaragi", valor: 130, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Chã Grande", valor: 160, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Vitória de Santo Antão", valor: 140, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pombos", valor: 160, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Gravatá", valor: 210, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Bezerros", valor: 230, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Caruaru", valor: 300, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Curcurana", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Vitarela", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Sotave", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Comportas", valor: 35, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Barra de Jangada", valor: 40, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Candeias", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Piedade", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Prazeres", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Cajueiro Seco", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Shopping Guararapes", valor: 45, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Boa Viagem", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Pina", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Ibura", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Jordão", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Muribeca", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Aeroporto Internacional do Recife", valor: 50, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Shopping Recife", valor: 60, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "RioMar", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Jaboatão Velho", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "CEASA", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Terminal Integrado de Passageiros (TIP)", valor: 90, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Moreno", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "
