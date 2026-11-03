@@ -162,5 +162,35 @@
   <h2>Tabela de Viagens 🧾</h2>
 
   <div class="alerts-box">
-    <b>🚨
-      
+    <b>🚨 Avisos Importantes:</b>
+    • <b>Noite (23h às 05h):</b> Acréscimo de R$ 5,00 a R$ 10,00.<br>
+    • <b>Praias (Sáb, Dom e Feriados):</b> Saídas das praias +R$ 10,00.<br>
+    • <b>Mercados/Atacados:</b> Feira +R$ 5,00 | Para Pista Preta, Burrama e Eng. Novo +R$ 5,00.<br>
+    • <b>Adicionais:</b> Animais (+R$ 10), Bagagem (+R$ 5) e Excesso de Passageiros (+50%).
+  </div>
+
+  <button type="button" class="btn-big-mic" id="btnMic" onclick="ouvirVoz()">
+    🎙️ Toque aqui e fale o destino (Ex: Cabo Recife)
+  </button>
+
+  <label for="origem">Digite a Origem:</label>
+  <input type="text" id="origem" class="campo-texto" placeholder="Ex: Cabo, Charneca..." oninput="calcularValor()">
+
+  <label for="destino">Digite o Destino:</label>
+  <input type="text" id="destino" class="campo-texto" placeholder="Ex: Recife, Aeroporto..." oninput="calcularValor()">
+
+  <div class="checkbox-group">
+    <label><input type="checkbox" id="noite" onchange="calcularValor()"> 🌙 Viagem Noturna (23h às 05h) [+R$ 7,50 méd.]</label>
+    <label><input type="checkbox" id="praiaFDS" onchange="calcularValor()"> 🏖️ Saída de Praia (Sáb/Dom/Feriado) [+R$ 10,00]</label>
+    <label><input type="checkbox" id="mercado" onchange="calcularValor()"> 🛒 Saída de Mercado/Atacado [+R$ 5,00]</label>
+    <label><input type="checkbox" id="cartao" onchange="calcularValor()"> 💳 Pagamento Cartão Crédito/Débito [+5% taxa]</label>
+    <label><input type="checkbox" id="animal" onchange="calcularValor()"> 🐕 Viagem com Animal [+R$ 10,00]</label>
+    <label><input type="checkbox" id="bagagem" onchange="calcularValor()"> 🧳 Muita Bagagem [+R$ 5,00]</label>
+    <label><input type="checkbox" id="excesso" onchange="calcularValor()"> 👥 Excesso de Passageiros (+50% no valor)</label>
+  </div>
+
+  <div id="obsRota" class="obs-box" style="display:none;"></div>
+
+  <div class="price-box">
+    <span>Valor Total Estimado:</span>
+    <div id="valor" class
