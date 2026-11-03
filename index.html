@@ -805,4 +805,165 @@
     { origem: "Cabo de Santo Agostinho", destino: "CEASA", valor: 70, obs: "" },
     { origem: "Cabo de Santo Agostinho", destino: "Terminal Integrado de Passageiros (TIP)", valor: 90, obs: "" },
     { origem: "Cabo de Santo Agostinho", destino: "Moreno", valor: 100, obs: "" },
-    { origem: "Cabo de Santo Agostinho", destino: "
+    { origem: "Cabo de Santo Agostinho", destino: "Afogados", valor: 65, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Recife", valor: 70, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Santo Amaro", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Encruzilhada", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Tacaruna", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Casa Amarela", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Vasco da Gama", valor: 80, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Camaragibe", valor: 90, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Olinda", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "São Lourenço da Mata", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Abreu e Lima", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Paulista", valor: 100, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Igarassu", valor: 130, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Itapissuma", valor: 145, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Ilha de Itamaracá", valor: 160, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "João Pessoa", valor: 280, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Paudalho", valor: 140, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Carpina", valor: 160, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Limoeiro", valor: 200, obs: "" },
+    { origem: "Cabo de Santo Agostinho", destino: "Surubim", valor: 260, obs: "" }
+  ];
+
+  const SEU_NUMERO_WHATSAPP = "5581999999999"; // Substitua pelo seu WhatsApp
+
+  // Função auxiliar para remover acentos e caracteres especiais
+  function normalizarTexto(txt) {
+    return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  }
+
+  function ouvirConsultaCompleta() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Seu navegador não suporta reconhecimento de voz. Tente usar o Google Chrome.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const btnMic = document.getElementById("btnMic");
+
+    recognition.onstart = function() {
+      btnMic.style.backgroundColor = "#ff9800";
+      btnMic.innerHTML = "👂 Ouvindo... Fale (Ex: Cabo Recife)";
+    };
+
+    recognition.onresult = function(event) {
+      let textoFalado = event.results[0][0].transcript.toLowerCase().replace('.', '').trim();
+      let palavras = textoFalado.split(" ");
+      
+      if (palavras.length >= 2) {
+        let origemLida = palavras[0];
+        let destinoLido = palavras.slice(1).join(" ");
+
+        document.getElementById("origem").value = origemLida.charAt(0).toUpperCase() + origemLida.slice(1);
+        document.getElementById("destino").value = destinoLido.charAt(0).toUpperCase() + destinoLido.slice(1);
+        
+        calcularValor();
+      } else {
+        alert("Fale os dois locais, por exemplo: 'Cabo Recife' ou 'Gaibu Suape'.");
+      }
+
+      btnMic.style.backgroundColor = "#ea4335";
+      btnMic.innerHTML = "🎙️ Falar Destino (Ex: Cabo Recife)";
+    };
+
+    recognition.onerror = function() {
+      alert("Não entendido. Tente falar novamente.");
+      btnMic.style.backgroundColor = "#ea4335";
+      btnMic.innerHTML = "🎙️ Falar Destino (Ex: Cabo Recife)";
+    };
+
+    recognition.start();
+  }
+
+  function calcularValor() {
+    const oInput = normalizarTexto(document.getElementById("origem").value);
+    const dInput = normalizarTexto(document.getElementById("destino").value);
+    const divValor = document.getElementById("valor");
+    const divObs = document.getElementById("obsRota");
+    const btnZap = document.getElementById("btnZap");
+
+    if (!oInput || !dInput) {
+      divValor.textContent = "R$ --,--";
+      divObs.style.display = "none";
+      btnZap.style.display = "none";
+      return;
+    }
+
+    // Busca flexível: aceita digitação exata ou se o texto contiver o termo (ex: "cabo" encontra "Cabo de Santo Agostinho")
+    const rotaEncontrada = rotas.find(r => {
+      const origNorm = normalizarTexto(r.origem);
+      const destNorm = normalizarTexto(r.destino);
+
+      const matchOrigem = origNorm === oInput || origNorm.includes(oInput) || oInput.includes(origNorm);
+      const matchDestino = destNorm === dInput || destNorm.includes(dInput) || dInput.includes(destNorm);
+
+      return matchOrigem && matchDestino;
+    });
+
+    if (rotaEncontrada) {
+      let valorFinal = rotaEncontrada.valor;
+      let observacoes = [];
+
+      if (document.getElementById("noite").checked) {
+        valorFinal += 7.50;
+        observacoes.push("Taxa Noite");
+      }
+      if (document.getElementById("praiaFDS").checked) {
+        valorFinal += 10.00;
+        observacoes.push("Taxa Praia FDS/Feriado");
+      }
+      if (document.getElementById("mercado").checked) {
+        valorFinal += 5.00;
+        observacoes.push("Taxa Mercado");
+      }
+      if (document.getElementById("animal").checked) {
+        valorFinal += 10.00;
+        observacoes.push("Taxa Animal");
+      }
+      if (document.getElementById("bagagem").checked) {
+        valorFinal += 5.00;
+        observacoes.push("Taxa Bagagem");
+      }
+      if (document.getElementById("excesso").checked) {
+        valorFinal += (rotaEncontrada.valor * 0.50);
+        observacoes.push("Excesso Passageiros");
+      }
+      if (document.getElementById("cartao").checked) {
+        valorFinal += (valorFinal * 0.05);
+        observacoes.push("Pgto Cartão (+5%)");
+      }
+
+      const precoFormatado = valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      divValor.textContent = precoFormatado;
+
+      // Exibe observações da própria rota (ex: "Acrescentar pedágio" ou "Até o Segundo Modelo")
+      if (rotaEncontrada.obs) {
+        divObs.textContent = `📌 ${rotaEncontrada.obs}`;
+        divObs.style.display = "block";
+      } else {
+        divObs.style.display = "none";
+      }
+
+      let textoObs = observacoes.length > 0 ? ` (${observacoes.join(", ")})` : "";
+      let textoPedagio = rotaEncontrada.obs ? ` [${rotaEncontrada.obs}]` : "";
+      
+      const texto = encodeURIComponent(`Olá! Gostaria de pedir uma viagem de *${rotaEncontrada.origem}* para *${rotaEncontrada.destino}*. Valor calculado: *${precoFormatado}*${textoObs}${textoPedagio}.`);
+      btnZap.href = `https://wa.me/${SEU_NUMERO_WHATSAPP}?text=${texto}`;
+      btnZap.style.display = "block";
+    } else {
+      divValor.textContent = "Sob consulta";
+      divObs.style.display = "none";
+      btnZap.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>
