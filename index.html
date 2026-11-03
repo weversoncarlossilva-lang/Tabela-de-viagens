@@ -45,16 +45,14 @@
       margin-bottom: 5px;
       font-size: 14px;
     }
-    select, input[type="checkbox"] {
-      font-size: 16px;
-    }
-    select {
+    input[type="text"] {
       width: 100%;
       padding: 12px;
       border-radius: 8px;
       border: 1px solid #ccc;
       background-color: #fff;
       box-sizing: border-box;
+      font-size: 16px;
     }
     .checkbox-group {
       margin-top: 15px;
@@ -141,15 +139,13 @@
     • <b>Adicionais:</b> Animais (+R$ 10), Bagagem (+R$ 5) e Excesso de Passageiros (+50%).
   </div>
 
-  <label for="origem">Origem:</label>
-  <select id="origem" onchange="atualizarDestinos()">
-    <option value="">Selecione a origem</option>
-  </select>
+  <label for="origem">Digite a Origem:</label>
+  <input type="text" id="origem" list="lista-origens" placeholder="Ex: Cabo, Charneca, Gaibu..." oninput="calcularValor()">
+  <datalist id="lista-origens"></datalist>
 
-  <label for="destino">Destino:</label>
-  <select id="destino" onchange="calcularValor()">
-    <option value="">Selecione o destino</option>
-  </select>
+  <label for="destino">Digite o Destino:</label>
+  <input type="text" id="destino" list="lista-destinos" placeholder="Ex: Aeroporto, Centro, Suape..." oninput="calcularValor()">
+  <datalist id="lista-destinos"></datalist>
 
   <div class="checkbox-group">
     <label><input type="checkbox" id="noite" onchange="calcularValor()"> 🌙 Viagem Noturna (23h às 05h) [+R$ 7,50 méd.]</label>
@@ -174,9 +170,8 @@
 </div>
 
 <script>
-  // TODAS AS ROTAS DA SUA TABELA COMPLETA:
+  // ROTAS CADASTRADAS
   const rotas = [
-    // 1️⃣ PRAIAS
     { origem: "Cabo", destino: "Jaqueira(Gaibu)", valor: 40.00 },
     { origem: "Cabo", destino: "Pantanal", valor: 45.00 },
     { origem: "Cabo", destino: "Xareu", valor: 35.00 },
@@ -203,8 +198,6 @@
     { origem: "Cabo", destino: "Tamandaré", valor: 180.00 },
     { origem: "Cabo", destino: "São José da Coroa Grande", valor: 220.00 },
     { origem: "Cabo", destino: "Maragogi", valor: 250.00 },
-
-    // 2️⃣ CABO CENTRO E REGIÕES
     { origem: "Centro", destino: "Centro", valor: 13.00 },
     { origem: "Cabo", destino: "Mauriti ou Bela Vista ou Cruzeiro", valor: 13.00 },
     { origem: "Cabo", destino: "COHAB ou Rua Do Açude", valor: 13.00 },
@@ -235,8 +228,6 @@
     { origem: "Cabo", destino: "Aymara", valor: 25.00 },
     { origem: "Cruzeiro ou Mauriti", destino: "Destilaria, Vila social, Vila Roca e Santo Inácio", valor: 15.00 },
     { origem: "B.São Francisco ou Charnequinha", destino: "Destilaria ou Vila social ou Vila Roca e Santo Inácio", valor: 15.00 },
-
-    // 3️⃣ CHARNECA / NOVO HORIZONTE
     { origem: "Charneca", destino: "Charneca", valor: 15.00 },
     { origem: "Charneca", destino: "Cajueiro", valor: 15.00 },
     { origem: "Charneca", destino: "Centro geral", valor: 20.00 },
@@ -298,8 +289,6 @@
     { origem: "Charneca", destino: "Enseadas, Gaibú", valor: 55.00 },
     { origem: "Charneca", destino: "Itapoama, Suape", valor: 60.00 },
     { origem: "Charneca", destino: "Paiva", valor: 60.00 },
-
-    // 4️⃣ ALTO DO CAJUEIRO
     { origem: "Cajueiro", destino: "Centro", valor: 25.00 },
     { origem: "Cajueiro", destino: "Barbalho 1 ou 2", valor: 20.00 },
     { origem: "Cajueiro", destino: "N. Horizonte", valor: 20.00 },
@@ -322,8 +311,6 @@
     { origem: "Cajueiro", destino: "Aguiar América", valor: 25.00 },
     { origem: "Cajueiro", destino: "Cida parque", valor: 20.00 },
     { origem: "Cajueiro", destino: "Espaço S", valor: 35.00 },
-
-    // 5️⃣ PIRAPAMA
     { origem: "Pirapama", destino: "Pirapama", valor: 15.00 },
     { origem: "Pirapama", destino: "Mista ou Grau", valor: 15.00 },
     { origem: "Pirapama", destino: "Vai e vem ou Lay ou Pajeú", valor: 25.00 },
@@ -360,8 +347,6 @@
     { origem: "Pirapama", destino: "Eng Castelo", valor: 40.00 },
     { origem: "Pirapama", destino: "Comp.Suape", valor: 50.00 },
     { origem: "Pirapama", destino: "Deca ou Acher ou Sulog", valor: 40.00 },
-
-    // 6️⃣ COHAB
     { origem: "Cohab", destino: "Cohab", valor: 13.00 },
     { origem: "Cohab", destino: "Centro", valor: 13.00 },
     { origem: "Cohab", destino: "Shopping ou Destilaria ou Santo Inácio ou Vila Roca ou Vila Social", valor: 13.00 },
@@ -391,8 +376,6 @@
     { origem: "Cohab", destino: "Castelo até o campo", valor: 35.00 },
     { origem: "Cohab", destino: "Eng castelo", valor: 55.00 },
     { origem: "Cohab", destino: "Ipojuca", valor: 35.00 },
-
-    // 7️⃣ CHARNEQUINHA E BAIRRO S FRANCISCO
     { origem: "Charnequinha", destino: "Destilaria, Vila Roca, Santo Inácio", valor: 17.00 },
     { origem: "Charnequinha", destino: "Bela Vista, Cruzeiro, Cohab, Mauriti", valor: 15.00 },
     { origem: "Charnequinha", destino: "S.Francisco", valor: 13.00 },
@@ -402,4 +385,5 @@
     { origem: "Charnequinha", destino: "Novo horizonte, Charneca, Pirapama, Barbalho1e2", valor: 18.00 },
     { origem: "Charnequinha", destino: "Sitio de panta", valor: 23.00 },
     { origem: "Charnequinha", destino: "Tururú", valor: 23.00 },
-    { origem
+    { origem: "Charnequinha", destino: "Rosário", valor: 20.00 },
+    { origem: "Charnequinha", destino: "Charneca ant estação", valor: 23
