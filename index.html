@@ -846,7 +846,7 @@
     
     const textoMensagem = `🚗 *NOVA CORRIDA SOLICITADA* 🚗\n\n*Origem:* ${origem}\n*Destino:* ${destino}\n*Valor:* ${valorAtualCalculado}${textoDetalhesObs}\n\n_Motorista, responda *EU* para aceitar!_`;
 
-    const url = `https://api.whatsapp.com/send?text=` + encodeURIComponent(textoMensagem);
+    const url = `https://api.whatsapp.com/send?phone=5581988932634&text=` + encodeURIComponent(textoMensagem);
     window.open(url, '_blank');
   }
 </script>
