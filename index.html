@@ -591,7 +591,7 @@
     { origem: "Cabo", destino: "Porto de Suape", valor: 40, obs: "Acrescentar Pedágio" },
     { origem: "Cabo", destino: "Elog Suape", valor: 40, obs: "Acrescentar Pedágio" },
     { origem: "Cabo", destino: "Nossa Senhora do Ó", valor: 60, obs: "" },
-    { origem: "Cabo", destino: "Camela", valor: 80, obs: "" },
+    { origem: "Cabo", destino: "Camela", valor: 90, obs: "" },
     { origem: "Cabo", destino: "Sirinhaém", valor: 100, obs: "" },
     { origem: "Cabo", destino: "Barra de Sirinhaém", valor: 120, obs: "" },
     { origem: "Cabo", destino: "Rio Formoso", valor: 130, obs: "" },
@@ -684,7 +684,7 @@
     { origem: "Gaibu", destino: "Nossa Senhora do Ó", valor: 70, obs: "" },
     { origem: "Cabo", destino: "Praia dos Carneiros", valor: 150, obs: "" },
     { origem: "Cabo", destino: "Serrambi", valor: 100, obs: "" },
-    { origem: "Cabo", destino: "Tamandaré", valor: 180, obs: "" },
+    { origem: "Calo", destino: "Tamandaré", valor: 180, obs: "" },
     { origem: "Cabo", destino: "São José da Coroa Grande", valor: 220, obs: "" },
     { origem: "Cabo", destino: "Maragogi", valor: 250, obs: "" },
     { origem: "Cabo", destino: "Santo Inácio", valor: 13, obs: "" },
@@ -841,12 +841,8 @@
   }
 
   function enviarWhatsApp() {
-    const origem = document.getElementById("origem").value;
-    const destino = document.getElementById("destino").value;
-    
-    const textoMensagem = `🚗 *NOVA CORRIDA SOLICITADA* 🚗\n\n*Origem:* ${origem}\n*Destino:* ${destino}\n*Valor:* ${valorAtualCalculado}${textoDetalhesObs}\n\n_Motorista, responda *EU* para aceitar!_`;
-
-    const url = `https://api.whatsapp.com/send?text=` + encodeURIComponent(textoMensagem);
+    // Abre diretamente o link do grupo do WhatsApp que você forneceu
+    const url = "https://chat.whatsapp.com/BxJtEsEqdZwF3bj7u8hJsp?s=cl&p=a&iam=2";
     window.open(url, '_blank');
   }
 </script>
